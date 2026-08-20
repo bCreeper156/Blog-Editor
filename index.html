@@ -84,6 +84,43 @@ body{background:#f8fafc;color:#1e293b;height:100vh;display:flex;flex-direction:c
 .modal-box label{font-size:13px;color:#64748b;display:block;margin-top:8px;}
 .modal-buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
 .modal-buttons button{padding:6px 12px;border-radius:6px;border:1px solid #cbd5e1;cursor:pointer;}
+  /* Toast 通知系统 - 右上角自动消失 */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+.toast-item {
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-size: 14px;
+  max-width: 360px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateX(20px);
+  animation: toastIn 0.3s forwards;
+  border-left: 4px solid #3b82f6;
+}
+.toast-item.success { border-left-color: #22c55e; }
+.toast-item.warning { border-left-color: #eab308; }
+.toast-item.error { border-left-color: #ef4444; }
+.toast-item.hiding {
+  animation: toastOut 0.3s forwards;
+}
+@keyframes toastIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateX(20px); }
+}
 </style>
 </head>
 <body>
@@ -159,6 +196,26 @@ body{background:#f8fafc;color:#1e293b;height:100vh;display:flex;flex-direction:c
 </div>
 
 <script>
+  // ========== Toast 通知系统 ==========
+function showToast(message, type = 'info', duration = 3000) {
+  const container = document.getElementById('toastContainer') || (() => {
+    const div = document.createElement('div');
+    div.id = 'toastContainer';
+    div.className = 'toast-container';
+    document.body.appendChild(div);
+    return div;
+  })();
+
+  const item = document.createElement('div');
+  item.className = `toast-item ${type}`;
+  item.textContent = message;
+  container.appendChild(item);
+
+  setTimeout(() => {
+    item.classList.add('hiding');
+    setTimeout(() => item.remove(), 300);
+  }, duration);
+}
 // 简易md转html（够用博客场景）
 function mdToHtml(md){
   let html = md
